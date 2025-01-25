@@ -1,5 +1,4 @@
 import {
-  Fragment,
   memo,
   useCallback,
   useContext,
@@ -12,17 +11,12 @@ import { createRoot } from "react-dom/client";
 import invariant from "tiny-invariant";
 
 import Button from "@atlaskit/button";
-import DropdownMenu, {
-  DropdownItem,
-  DropdownItemGroup,
-} from "@atlaskit/dropdown-menu";
+import DropdownMenu from "@atlaskit/dropdown-menu";
 
 import mergeRefs from "@atlaskit/ds-lib/merge-refs";
 import FocusRing from "@atlaskit/focus-ring";
 import ChevronDownIcon from "@atlaskit/icon/utility/migration/chevron-down";
 import ChevronRightIcon from "@atlaskit/icon/utility/migration/chevron-right";
-import MoreIcon from "@atlaskit/icon/utility/migration/show-more-horizontal--more";
-import { ModalTransition } from "@atlaskit/modal-dialog";
 import {
   type Instruction,
   type ItemMode,
@@ -41,7 +35,6 @@ import { token } from "@atlaskit/tokens";
 import { type TreeItem as TreeItemType } from "../../data/tree";
 
 import { indentPerLevel } from "./constants";
-import { MoveDialog } from "./move-dialog";
 import { DependencyContext, TreeContext } from "./tree-context";
 import styles from "./tree-item.module.css";
 
@@ -322,16 +315,8 @@ const TreeItem = memo(function TreeItem({
     };
   })();
 
-  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
-  const openMoveDialog = useCallback(() => {
-    setIsMoveDialogOpen(true);
-  }, []);
-  const closeMoveDialog = useCallback(() => {
-    setIsMoveDialogOpen(false);
-  }, []);
-
   return (
-    <Fragment>
+    <>
       <div
         className={state === "idle" ? styles.outerHover : undefined}
         style={{ position: "relative" }}
@@ -375,24 +360,13 @@ const TreeItem = memo(function TreeItem({
           trigger={({ triggerRef, ...triggerProps }) => (
             <Button
               ref={mergeRefs([triggerRef, actionMenuTriggerRef])}
-              iconBefore={
-                <MoreIcon
-                  label="Actions"
-                  LEGACY_size="small"
-                  color={token("color.icon.subtle", "#626F86")}
-                />
-              }
               {...triggerProps}
               spacing="compact"
               style={{ position: "absolute", top: 8, right: 8 }}
               appearance="subtle"
             />
           )}
-        >
-          <DropdownItemGroup>
-            <DropdownItem onClick={openMoveDialog}>Move</DropdownItem>
-          </DropdownItemGroup>
-        </DropdownMenu>
+        ></DropdownMenu>
       </div>
       {item.children.length && item.isOpen ? (
         <div id={aria?.["aria-controls"]}>
@@ -420,7 +394,7 @@ const TreeItem = memo(function TreeItem({
           })}
         </div>
       ) : null}
-    </Fragment>
+    </>
   );
 });
 
