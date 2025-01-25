@@ -1,0 +1,8 @@
+.treeContainer {
+  display: flex;
+  box-sizing: border-box;
+  width: 280px;
+  padding: 8px;
+  flex-direction: column;
+  background: var(--ds-elevation-surface-sunken, #f7f8f9);
+}

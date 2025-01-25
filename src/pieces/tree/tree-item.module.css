@@ -1,0 +1,77 @@
+.outerButton {
+  --grid: 8px;
+  /* Without this Safari renders white text on drag */
+  color: var(--ds-text, currentColor);
+  border: 0;
+  width: 100%;
+  position: relative;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.outerHover {
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.outerHover:hover {
+  background: var(
+    --ds-background-neutral-subtle-hovered,
+    rgba(9, 30, 66, 0.06)
+  );
+}
+
+.innerDragging {
+  opacity: 0.4;
+}
+
+.innerButton {
+  padding: var(--grid);
+  padding-right: 40px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  background: var(--ds-background-neutral-subtle, transparent);
+  border-radius: 3px;
+}
+
+.id {
+  margin: 0;
+  color: var(--ds-text-disabled, #8993a5);
+}
+
+.label {
+  flex-grow: 1;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.debug {
+  position: absolute;
+  right: var(--grid);
+  bottom: 0;
+  font-size: 6px;
+}
+
+.preview {
+  --grid: 8px;
+  background: var(--ds-elevation-surface-raised, #fff);
+  padding: var(--grid);
+  border-radius: 3px;
+}
+
+.parentOfInstruction {
+  background: var(--ds-background-selected-hovered, transparent);
+}
+
+.previewStyles {
+  --grid: 8px;
+  background: var(--ds-elevation-surface-raised, #fff);
+  padding: var(--grid);
+  border-radius: 3px;
+}
