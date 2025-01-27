@@ -9,7 +9,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { jsx } from '@emotion/react';
 import invariant from 'tiny-invariant';
 
-import Button from '@atlaskit/button/new';
+import Button from '@atlaskit/button';
 import Form, { Field } from '@atlaskit/form';
 import Modal, { ModalBody, ModalFooter, ModalHeader, ModalTitle } from '@atlaskit/modal-dialog';
 import Select from '@atlaskit/select';
