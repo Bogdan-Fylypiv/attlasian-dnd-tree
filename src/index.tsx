@@ -1,10 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom";
+import "@atlaskit/css-reset";
+import AppProvider from "@atlaskit/app-provider";
+import App from "./App";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+<AppProvider children={<App />}>
+
+</AppProvider>,
+ document.getElementById("root")
 );
