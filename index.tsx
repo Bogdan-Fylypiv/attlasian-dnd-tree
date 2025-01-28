@@ -6,7 +6,7 @@ import AppProvider from '@atlaskit/app-provider';
 import Example from './example';
 
 ReactDOM.render(
-  <AppProvider>
+  <AppProvider children={<Example />}>
     <Example />
   </AppProvider>,
   document.getElementById('root')

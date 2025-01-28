@@ -30,8 +30,8 @@
     "@atlaskit/tokens": "3.1.0",
     "@emotion/react": "11.7.1",
     "memoize-one": "^6.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "styled-components": "^6.1.14",
     "tiny-invariant": "^1.2.0"
   },

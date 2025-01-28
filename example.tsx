@@ -123,40 +123,35 @@ export default function Tree() {
 	 * Uses a depth-first search (DFS) to compile a list of possible targets.
 	 */
 	const getMoveTargets = useCallback(({ itemId }: { itemId: string }) => {
-		const data = lastStateRef.current;
-
-		const targets = [];
-
-		const searchStack = Array.from(data);
+		const data: TreeItemType[] = lastStateRef.current; // Ensure proper typing
+		const targets: TreeItemType[] = [];
+		const searchStack: TreeItemType[] = Array.from(data);
+	
 		while (searchStack.length > 0) {
-			const node = searchStack.pop();
-
-			if (!node) {
-				continue;
-			}
-
-			/**
-			 * If the current node is the item we want to move, then it is not a valid
-			 * move target and neither are its children.
-			 */
-			if (node.id === itemId) {
-				continue;
-			}
-
-			/**
-			 * Draft items cannot have children.
-			 */
-			if (node.isDraft) {
-				continue;
-			}
-
-			targets.push(node);
-
-			node.children.forEach((childNode) => searchStack.push(childNode));
+		  const node = searchStack.pop(); // Typed as TreeItemType | undefined
+	
+		  if (!node) {
+			continue;
+		  }
+	
+		  // Skip the item being moved and its children
+		  if (node.id === itemId) {
+			continue;
+		  }
+	
+		  // Skip draft items
+		  if (node.isDraft) {
+			continue;
+		  }
+	
+		  targets.push(node);
+	
+		  // Add children to the stack
+		  node.children.forEach((childNode) => searchStack.push(childNode));
 		}
-
+	
 		return targets;
-	}, []);
+	  }, []);
 
 	const getChildrenOfItem = useCallback((itemId: string) => {
 		const data = lastStateRef.current;
