@@ -1,6 +1,6 @@
-import invariant from "tiny-invariant";
+import invariant from 'tiny-invariant';
 
-import type { Instruction } from "@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item";
+import type { Instruction } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 
 export type TreeItem = {
   id: string;
@@ -21,44 +21,44 @@ export function getInitialTreeState(): TreeState {
 export function getInitialData(): TreeItem[] {
   return [
     {
-      id: "1",
+      id: '1',
       isOpen: true,
 
       children: [
         {
-          id: "1.3",
+          id: '1.3',
           isOpen: true,
 
           children: [
             {
-              id: "1.3.1",
+              id: '1.3.1',
               children: [],
             },
             {
-              id: "1.3.2",
+              id: '1.3.2',
               isDraft: true,
               children: [],
             },
           ],
         },
-        { id: "1.4", children: [] },
+        { id: '1.4', children: [] },
       ],
     },
     {
-      id: "2",
+      id: '2',
       isOpen: true,
       children: [
         {
-          id: "2.3",
+          id: '2.3',
           isOpen: true,
 
           children: [
             {
-              id: "2.3.1",
+              id: '2.3.1',
               children: [],
             },
             {
-              id: "2.3.2",
+              id: '2.3.2',
               children: [],
             },
           ],
@@ -70,24 +70,24 @@ export function getInitialData(): TreeItem[] {
 
 export type TreeAction =
   | {
-      type: "instruction";
-      instruction: Instruction;
-      itemId: string;
-      targetId: string;
-    }
+  type: 'instruction';
+  instruction: Instruction;
+  itemId: string;
+  targetId: string;
+}
   | {
-      type: "toggle";
-      itemId: string;
-    }
+  type: 'toggle';
+  itemId: string;
+}
   | {
-      type: "expand";
-      itemId: string;
-    }
+  type: 'expand';
+  itemId: string;
+}
   | {
-      type: "collapse";
-      itemId: string;
-    }
-  | { type: "modal-move"; itemId: string; targetId: string; index: number };
+  type: 'collapse';
+  itemId: string;
+}
+  | { type: 'modal-move'; itemId: string; targetId: string; index: number };
 
 export const tree = {
   remove(data: TreeItem[], id: string): TreeItem[] {
@@ -103,11 +103,7 @@ export const tree = {
         return item;
       });
   },
-  insertBefore(
-    data: TreeItem[],
-    targetId: string,
-    newItem: TreeItem
-  ): TreeItem[] {
+  insertBefore(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         return [newItem, item];
@@ -121,11 +117,7 @@ export const tree = {
       return item;
     });
   },
-  insertAfter(
-    data: TreeItem[],
-    targetId: string,
-    newItem: TreeItem
-  ): TreeItem[] {
+  insertAfter(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         return [item, newItem];
@@ -141,11 +133,7 @@ export const tree = {
       return item;
     });
   },
-  insertChild(
-    data: TreeItem[],
-    targetId: string,
-    newItem: TreeItem
-  ): TreeItem[] {
+  insertChild(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         // already a parent: add as first child
@@ -182,10 +170,10 @@ export const tree = {
     }
   },
   getPathToItem({
-    current,
-    targetId,
-    parentIds = [],
-  }: {
+                  current,
+                  targetId,
+                  parentIds = [],
+                }: {
     current: TreeItem[];
     targetId: string;
     parentIds?: string[];
@@ -209,10 +197,7 @@ export const tree = {
   },
 };
 
-export function treeStateReducer(
-  state: TreeState,
-  action: TreeAction
-): TreeState {
+export function treeStateReducer(state: TreeState, action: TreeAction): TreeState {
   return {
     data: dataReducer(state.data, action),
     lastAction: action,
@@ -220,17 +205,17 @@ export function treeStateReducer(
 }
 
 const dataReducer = (data: TreeItem[], action: TreeAction) => {
-  console.log("action", action);
+  console.log('action', action);
 
   const item = tree.find(data, action.itemId);
   if (!item) {
     return data;
   }
 
-  if (action.type === "instruction") {
+  if (action.type === 'instruction') {
     const instruction = action.instruction;
 
-    if (instruction.type === "reparent") {
+    if (instruction.type === 'reparent') {
       const path = tree.getPathToItem({
         current: data,
         targetId: action.targetId,
@@ -247,25 +232,25 @@ const dataReducer = (data: TreeItem[], action: TreeAction) => {
       return data;
     }
 
-    if (instruction.type === "reorder-above") {
+    if (instruction.type === 'reorder-above') {
       let result = tree.remove(data, action.itemId);
       result = tree.insertBefore(result, action.targetId, item);
       return result;
     }
 
-    if (instruction.type === "reorder-below") {
+    if (instruction.type === 'reorder-below') {
       let result = tree.remove(data, action.itemId);
       result = tree.insertAfter(result, action.targetId, item);
       return result;
     }
 
-    if (instruction.type === "make-child") {
+    if (instruction.type === 'make-child') {
       let result = tree.remove(data, action.itemId);
       result = tree.insertChild(result, action.targetId, item);
       return result;
     }
 
-    console.warn("TODO: action not implemented", instruction);
+    console.warn('TODO: action not implemented', instruction);
 
     return data;
   }
@@ -282,31 +267,31 @@ const dataReducer = (data: TreeItem[], action: TreeAction) => {
     return { ...item, children: item.children.map(toggle) };
   }
 
-  if (action.type === "toggle") {
+  if (action.type === 'toggle') {
     return data.map(toggle);
   }
 
-  if (action.type === "expand") {
+  if (action.type === 'expand') {
     if (tree.hasChildren(item) && !item.isOpen) {
       return data.map(toggle);
     }
     return data;
   }
 
-  if (action.type === "collapse") {
+  if (action.type === 'collapse') {
     if (tree.hasChildren(item) && item.isOpen) {
       return data.map(toggle);
     }
     return data;
   }
 
-  if (action.type === "modal-move") {
+  if (action.type === 'modal-move') {
     let result = tree.remove(data, item.id);
 
     const siblingItems = getChildItems(result, action.targetId);
 
     if (siblingItems.length === 0) {
-      if (action.targetId === "") {
+      if (action.targetId === '') {
         /**
          * If the target is the root level, and there are no siblings, then
          * the item is the only thing in the root level.
@@ -344,7 +329,7 @@ function getChildItems(data: TreeItem[], targetId: string) {
   /**
    * An empty string is representing the root
    */
-  if (targetId === "") {
+  if (targetId === '') {
     return data;
   }
 

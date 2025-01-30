@@ -1,52 +1,37 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
-import memoizeOne from "memoize-one";
-import invariant from "tiny-invariant";
+import memoizeOne from 'memoize-one';
+import invariant from 'tiny-invariant';
 
-import { triggerPostMoveFlash } from "@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash";
+import { triggerPostMoveFlash } from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
 import {
   type Instruction,
   type ItemMode,
-} from "@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item";
-import * as liveRegion from "@atlaskit/pragmatic-drag-and-drop-live-region";
-import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
-import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
+import * as liveRegion from '@atlaskit/pragmatic-drag-and-drop-live-region';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { token } from '@atlaskit/tokens';
 
 import {
   getInitialTreeState,
   tree,
-  treeStateReducer,
   type TreeItem as TreeItemType,
-} from "@/data/tree";
-import {
-  DependencyContext,
-  TreeContext,
-  TreeContextValue,
-} from "@/pieces/tree/tree-context";
-import TreeItem from "@/pieces/tree/tree-item";
-import styles from "./tree.module.css";
+  treeStateReducer,
+} from './data';
+import { DependencyContext, TreeContext, type TreeContextValue } from './context';
+import TreeItem from './treeItem';
 
 type CleanupFn = () => void;
 
 function createTreeItemRegistry() {
-  const registry = new Map<
-    string,
-    { element: HTMLElement; actionMenuTrigger: HTMLElement }
-  >();
+  const registry = new Map<string, { element: HTMLElement; actionMenuTrigger: HTMLElement }>();
 
   const registerTreeItem = ({
-    itemId,
-    element,
-    actionMenuTrigger,
-  }: {
+                              itemId,
+                              element,
+                              actionMenuTrigger,
+                            }: {
     itemId: string;
     element: HTMLElement;
     actionMenuTrigger: HTMLElement;
@@ -60,12 +45,8 @@ function createTreeItemRegistry() {
   return { registry, registerTreeItem };
 }
 
-export default function Tree() {
-  const [state, updateState] = useReducer(
-    treeStateReducer,
-    null,
-    getInitialTreeState
-  );
+const Tree = () => {
+  const [state, updateState] = useReducer(treeStateReducer, null, getInitialTreeState);
   const ref = useRef<HTMLDivElement>(null);
   const { extractInstruction } = useContext(DependencyContext);
 
@@ -82,18 +63,16 @@ export default function Tree() {
       return;
     }
 
-    if (lastAction.type === "modal-move") {
-      const parentName =
-        lastAction.targetId === "" ? "the root" : `Item ${lastAction.targetId}`;
+    if (lastAction.type === 'modal-move') {
+      const parentName = lastAction.targetId === '' ? 'the root' : `Item ${lastAction.targetId}`;
 
       liveRegion.announce(
         `You've moved Item ${lastAction.itemId} to position ${
           lastAction.index + 1
-        } in ${parentName}.`
+        } in ${parentName}.`,
       );
 
-      const { element, actionMenuTrigger } =
-        registry.get(lastAction.itemId) ?? {};
+      const { element, actionMenuTrigger } = registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
       }
@@ -107,7 +86,7 @@ export default function Tree() {
       return;
     }
 
-    if (lastAction.type === "instruction") {
+    if (lastAction.type === 'instruction') {
       const { element } = registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
@@ -170,7 +149,7 @@ export default function Tree() {
     /**
      * An empty string is representing the root
      */
-    if (itemId === "") {
+    if (itemId === '') {
       return data;
     }
 
@@ -182,27 +161,25 @@ export default function Tree() {
   const context = useMemo<TreeContextValue>(
     () => ({
       dispatch: updateState,
-      uniqueContextId: Symbol("unique-id"),
+      uniqueContextId: Symbol('unique-id'),
       // memoizing this function as it is called by all tree items repeatedly
       // An ideal refactor would be to update our data shape
       // to allow quick lookups of parents
       getPathToItem: memoizeOne(
-        (targetId: string) =>
-          tree.getPathToItem({ current: lastStateRef.current, targetId }) ?? []
+        (targetId: string) => tree.getPathToItem({ current: lastStateRef.current, targetId }) ?? [],
       ),
       getMoveTargets,
       getChildrenOfItem,
       registerTreeItem,
     }),
-    [getChildrenOfItem, getMoveTargets, registerTreeItem]
+    [getChildrenOfItem, getMoveTargets, registerTreeItem],
   );
 
   useEffect(() => {
     invariant(ref.current);
     return combine(
       monitorForElements({
-        canMonitor: ({ source }) =>
-          source.data.uniqueContextId === context.uniqueContextId,
+        canMonitor: ({ source }) => source.data.uniqueContextId === context.uniqueContextId,
         onDrop(args) {
           const { location, source } = args;
           // didn't drop on anything
@@ -210,19 +187,17 @@ export default function Tree() {
             return;
           }
 
-          if (source.data.type === "tree-item") {
+          if (source.data.type === 'tree-item') {
             const itemId = source.data.id as string;
 
             const target = location.current.dropTargets[0];
             const targetId = target.data.id as string;
 
-            const instruction: Instruction | null = extractInstruction(
-              target.data
-            );
+            const instruction: Instruction | null = extractInstruction(target.data);
 
             if (instruction !== null) {
               updateState({
-                type: "instruction",
+                type: 'instruction',
                 instruction,
                 itemId,
                 targetId,
@@ -230,39 +205,40 @@ export default function Tree() {
             }
           }
         },
-      })
+      }),
     );
   }, [context, extractInstruction]);
 
   return (
     <TreeContext.Provider value={context}>
-      <div style={{ display: "flex", justifyContent: "center", padding: 24 }}>
-        <div className={styles.treeContainer} id="tree" ref={ref}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+        <div style={{
+          display: 'flex',
+          boxSizing: 'border-box',
+          width: 280,
+          padding: 8,
+          flexDirection: 'column',
+          background: token('elevation.surface.sunken', '#F7F8F9'),
+        }} id="tree" ref={ref}>
           {data.map((item, index, array) => {
             const type: ItemMode = (() => {
               if (item.children.length && item.isOpen) {
-                return "expanded";
+                return 'expanded';
               }
 
               if (index === array.length - 1) {
-                return "last-in-group";
+                return 'last-in-group';
               }
 
-              return "standard";
+              return 'standard';
             })();
 
-            return (
-              <TreeItem
-                item={item}
-                level={0}
-                key={item.id}
-                mode={type}
-                index={index}
-              />
-            );
+            return <TreeItem item={item} level={0} key={item.id} mode={type} index={index} />;
           })}
         </div>
       </div>
     </TreeContext.Provider>
   );
 }
+
+export default Tree;
