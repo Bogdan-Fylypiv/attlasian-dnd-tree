@@ -28,17 +28,22 @@
     "@atlaskit/select": "18.9.5",
     "@atlaskit/tokens": "3.2.0",
     "@emotion/react": "11.7.1",
+    "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-dialog": "^1.1.5",
     "@radix-ui/react-dropdown-menu": "^2.1.5",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-slot": "^1.1.1",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "^0.474.0",
     "memoize-one": "^6.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
     "styled-components": "latest",
     "tailwind-merge": "^2.6.0",
-    "tiny-invariant": "^1.2.0"
+    "tiny-invariant": "^1.2.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

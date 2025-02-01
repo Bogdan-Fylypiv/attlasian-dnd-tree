@@ -87,7 +87,12 @@ export type TreeAction =
   type: 'collapse';
   itemId: string;
 }
-  | { type: 'modal-move'; itemId: string; targetId: string; index: number };
+  | {
+  type: 'modal-move';
+  itemId: string;
+  targetId: string;
+  index: number
+};
 
 export const tree = {
   remove(data: TreeItem[], id: string): TreeItem[] {

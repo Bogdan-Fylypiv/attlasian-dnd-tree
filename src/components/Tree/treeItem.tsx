@@ -31,13 +31,7 @@ import {
   DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
+import ActionsDialog from "@/components/Tree/actionsDialog.tsx";
 
 const iconColor = token('color.icon', '#44546F');
 
@@ -311,12 +305,12 @@ const TreeItem = memo(function TreeItem({
     };
   })();
 
-  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
-  const openMoveDialog = useCallback(() => {
-    setIsMoveDialogOpen(true);
+  const [isActionsDialogOpen, setIsActionsDialogOpen] = useState(false);
+  const openActionsDialog = useCallback(() => {
+    setIsActionsDialogOpen(true);
   }, []);
-  const closeMoveDialog = useCallback(() => {
-    setIsMoveDialogOpen(false);
+  const closeActionsDialog = useCallback(() => {
+    setIsActionsDialogOpen(false);
   }, []);
 
   return (
@@ -405,16 +399,17 @@ const TreeItem = memo(function TreeItem({
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
+              className="w-5 h-5"
               ref={actionMenuTriggerRef}
               variant="outline"
               size="icon"
               style={{ position: 'absolute', top: 8, right: 8 }}
             >
-              ...
+              ⋮
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={openMoveDialog}>
+            <DropdownMenuItem onSelect={openActionsDialog}>
               <span>Edit</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -446,19 +441,7 @@ const TreeItem = memo(function TreeItem({
           })}
         </div>
       ) : null}
-      {/*{isMoveDialogOpen && <ActionsDialog onClose={closeMoveDialog} itemId={item.id} />}*/}
-      {isMoveDialogOpen &&
-        <Dialog defaultOpen onOpenChange={(open) => !open && closeMoveDialog()}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle onClick={closeMoveDialog}>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your account
-              and remove your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>}
+      {isActionsDialogOpen && <ActionsDialog onClose={closeActionsDialog} itemId={item.id} />}
     </Fragment>
   );
 });
