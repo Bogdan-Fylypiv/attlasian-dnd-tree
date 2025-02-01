@@ -1,17 +1,17 @@
-import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import {useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState} from 'react';
 
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 
-import { triggerPostMoveFlash } from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
+import {triggerPostMoveFlash} from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
 import {
   type Instruction,
   type ItemMode,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import * as liveRegion from '@atlaskit/pragmatic-drag-and-drop-live-region';
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { token } from '@atlaskit/tokens';
+import {combine} from '@atlaskit/pragmatic-drag-and-drop/combine';
+import {monitorForElements} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import classes from './tree.module.css';
 
 import {
   getInitialTreeState,
@@ -19,8 +19,9 @@ import {
   type TreeItem as TreeItemType,
   treeStateReducer,
 } from './data';
-import { DependencyContext, TreeContext, type TreeContextValue } from './context';
+import {DependencyContext, TreeContext, type TreeContextValue} from './context';
 import TreeItem from './treeItem';
+import {Button} from "@/components/ui/button.tsx";
 
 type CleanupFn = () => void;
 
@@ -36,23 +37,23 @@ function createTreeItemRegistry() {
     element: HTMLElement;
     actionMenuTrigger: HTMLElement;
   }): CleanupFn => {
-    registry.set(itemId, { element, actionMenuTrigger });
+    registry.set(itemId, {element, actionMenuTrigger});
     return () => {
       registry.delete(itemId);
     };
   };
 
-  return { registry, registerTreeItem };
+  return {registry, registerTreeItem};
 }
 
 const Tree = () => {
   const [state, updateState] = useReducer(treeStateReducer, null, getInitialTreeState);
   const ref = useRef<HTMLDivElement>(null);
-  const { extractInstruction } = useContext(DependencyContext);
+  const {extractInstruction} = useContext(DependencyContext);
 
-  const [{ registry, registerTreeItem }] = useState(createTreeItemRegistry);
+  const [{registry, registerTreeItem}] = useState(createTreeItemRegistry);
 
-  const { data, lastAction } = state;
+  const {data, lastAction} = state;
   const lastStateRef = useRef<TreeItemType[]>(data);
   useEffect(() => {
     lastStateRef.current = data;
@@ -72,7 +73,7 @@ const Tree = () => {
         } in ${parentName}.`,
       );
 
-      const { element, actionMenuTrigger } = registry.get(lastAction.itemId) ?? {};
+      const {element, actionMenuTrigger} = registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
       }
@@ -87,7 +88,7 @@ const Tree = () => {
     }
 
     if (lastAction.type === 'instruction') {
-      const { element } = registry.get(lastAction.itemId) ?? {};
+      const {element} = registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
       }
@@ -107,7 +108,7 @@ const Tree = () => {
    *
    * Uses a depth-first search (DFS) to compile a list of possible targets.
    */
-  const getMoveTargets = useCallback(({ itemId }: { itemId: string }) => {
+  const getMoveTargets = useCallback(({itemId}: { itemId: string }) => {
     const data = lastStateRef.current;
 
     const targets = [];
@@ -166,7 +167,7 @@ const Tree = () => {
       // An ideal refactor would be to update our data shape
       // to allow quick lookups of parents
       getPathToItem: memoizeOne(
-        (targetId: string) => tree.getPathToItem({ current: lastStateRef.current, targetId }) ?? [],
+        (targetId: string) => tree.getPathToItem({current: lastStateRef.current, targetId}) ?? [],
       ),
       getMoveTargets,
       getChildrenOfItem,
@@ -179,9 +180,9 @@ const Tree = () => {
     invariant(ref.current);
     return combine(
       monitorForElements({
-        canMonitor: ({ source }) => source.data.uniqueContextId === context.uniqueContextId,
+        canMonitor: ({source}) => source.data.uniqueContextId === context.uniqueContextId,
         onDrop(args) {
-          const { location, source } = args;
+          const {location, source} = args;
           // didn't drop on anything
           if (!location.current.dropTargets.length) {
             return;
@@ -211,15 +212,10 @@ const Tree = () => {
 
   return (
     <TreeContext.Provider value={context}>
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
-        <div style={{
-          display: 'flex',
-          boxSizing: 'border-box',
-          width: 280,
-          padding: 8,
-          flexDirection: 'column',
-          background: token('elevation.surface.sunken', '#F7F8F9'),
-        }} id="tree" ref={ref}>
+      <div className={classes.root}>
+        <div
+          className={classes.container}
+          id="tree" ref={ref}>
           {data.map((item, index, array) => {
             const type: ItemMode = (() => {
               if (item.children.length && item.isOpen) {
@@ -233,9 +229,10 @@ const Tree = () => {
               return 'standard';
             })();
 
-            return <TreeItem item={item} level={0} key={item.id} mode={type} index={index} />;
+            return <TreeItem item={item} level={0} key={item.id} mode={type} index={index}/>;
           })}
         </div>
+        <Button variant="default" onClick={() => alert('click')}>Add new</Button>
       </div>
     </TreeContext.Provider>
   );

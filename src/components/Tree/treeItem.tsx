@@ -20,6 +20,7 @@ import {
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import type { DragLocationHistory } from '@atlaskit/pragmatic-drag-and-drop/types';
+import classes from "./treeItem.module.css"
 import { token } from '@atlaskit/tokens';
 
 import { type TreeItem as TreeItemType } from './data';
@@ -31,7 +32,7 @@ import {
   DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import ActionsDialog from "@/components/Tree/actionsDialog.tsx";
+import ActionsDialog from "@/components/Tree/actionsDialog";
 
 const iconColor = token('color.icon', '#44546F');
 
@@ -56,12 +57,7 @@ function Icon({ item }: { item: TreeItemType }) {
 }
 
 function Preview({ item }: { item: TreeItemType }) {
-  return <div style={{
-    // background: token('elevation.surface.raised', 'red'),
-    background: "#fff",
-    padding: "8px",
-    borderRadius: 3,
-  }}>Item {item.id}</div>;
+  return <div className={classes.preview}>Item {item.id}</div>;
 }
 
 // const parentOfInstructionStyles = css({
@@ -315,20 +311,7 @@ const TreeItem = memo(function TreeItem({
 
   return (
     <Fragment>
-      <div
-        style={{
-        ...{
-          position: 'relative'
-        },
-        ...(state === 'idle' ? {...{
-          borderRadius: 3,
-          cursor: 'pointer',
-          ':hover': {
-            background: token('color.background.neutral.subtle.hovered', 'rgba(9, 30, 66, 0.06)'),
-          },
-        }} : undefined)
-      }}
-      >
+      <div className={state === 'idle' ? classes.rootIdle : classes.root}>
         <FocusRing isInset>
           <button
             {...aria}
@@ -408,9 +391,12 @@ const TreeItem = memo(function TreeItem({
               ⋮
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="bg-white">
             <DropdownMenuItem onSelect={openActionsDialog}>
-              <span>Edit</span>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={openActionsDialog}>
+              Move
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

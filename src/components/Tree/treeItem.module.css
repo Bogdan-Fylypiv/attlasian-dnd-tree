@@ -1,0 +1,17 @@
+.root {
+    composes: relative from global;
+}
+
+.rootIdle {
+    composes: root;
+    composes: rounded-[3px] from global;
+    composes: cursor-pointer from global;
+    composes: hover_bg-[#ecedef] from global;
+}
+
+.preview {
+    composes: bg-white from global;
+    composes: p-[8px] from global;
+    composes: rounded-[3px] from global;
+}
+

@@ -1,3 +1,11 @@
 .root {
+    @apply flex flex-col items-center gap-2;
+    @apply p-[24px];
+}
 
+.container {
+    @apply flex flex-col;
+    @apply w-[280px];
+    @apply p-[8px];
+    @apply bg-[#F7F8F9];
 }
