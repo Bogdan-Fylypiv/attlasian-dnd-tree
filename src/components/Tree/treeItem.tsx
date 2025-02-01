@@ -57,7 +57,7 @@ function Icon({ item }: { item: TreeItemType }) {
 }
 
 function Preview({ item }: { item: TreeItemType }) {
-  return <div className={classes.preview}>Item {item.id}</div>;
+  return <div className={classes.preview}>{item.label}</div>;
 }
 
 // const parentOfInstructionStyles = css({
@@ -362,7 +362,7 @@ const TreeItem = memo(function TreeItem({
                 textAlign: 'left',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
-              }}>Item {item.id}</span>
+              }}>{item.label}</span>
 							<small style={{
                 margin: 0,
                 color: token('color.text.disabled', '#8993A5'),

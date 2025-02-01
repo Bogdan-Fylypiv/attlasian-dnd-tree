@@ -21,7 +21,7 @@ import {
 } from './data';
 import {DependencyContext, TreeContext, type TreeContextValue} from './context';
 import TreeItem from './treeItem';
-import {Button} from "@/components/ui/button.tsx";
+import AddNewDialog from "@/components/Tree/addNewDialog";
 
 type CleanupFn = () => void;
 
@@ -232,7 +232,7 @@ const Tree = () => {
             return <TreeItem item={item} level={0} key={item.id} mode={type} index={index}/>;
           })}
         </div>
-        <Button variant="default" onClick={() => alert('click')}>Add new</Button>
+        <AddNewDialog />
       </div>
     </TreeContext.Provider>
   );

@@ -9,7 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
 import {useForm} from "react-hook-form";
 import {
@@ -27,18 +27,22 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import {Input} from "@/components/ui/input";
 
 type FormValues = {
+  label: string;
   parent: string;
   position: string;
 };
 
-const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) => {
-  const {dispatch, getChildrenOfItem, getMoveTargets, getPathToItem} = useContext(TreeContext);
+const AddNewDialog = () => {
+  const [open, setOpen] = useState(false);
+  const {dispatch, getChildrenOfItem, getMoveTargets} = useContext(TreeContext);
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
-    defaultValues: { parent: "NONE", position: "1" },
+    defaultValues: { parent: "NONE", position: "1", label: "" },
   });
+  const itemId = crypto.randomUUID();
 
   const options = useMemo(() => {
     const targets = getMoveTargets({itemId});
@@ -47,21 +51,11 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
       return {label: `Item ${item.id}`, value: item.id};
     });
 
-    return [{label: 'No parent', value: 'NONE'}, ...targetOptions];
+    return [{label: 'No parent', value: "NONE"}, ...targetOptions];
   }, [getMoveTargets, itemId]);
 
-  const defaultParent: { label: string; value: string } = useMemo(() => {
-    const path = getPathToItem(itemId);
-    const parentId = path[path.length - 1] ?? "NONE";
-    const option = options.find((option) => option.value === parentId);
-    invariant(option);
-    return option;
-  }, [getPathToItem, itemId, options]);
-
-  const [parentId, setParentId] = useState(defaultParent.value === "NONE" ? "" : defaultParent.value);
+  const [parentId, setParentId] = useState("");
   const positionOptions = useMemo(() => {
-    console.log("positionOptions update");
-
     const targets = getChildrenOfItem(parentId).filter((item) => item.id !== itemId);
 
     return Array.from({length: targets.length + 1}, (_, index) => {
@@ -76,31 +70,58 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
     (data: FormValues) => {
       console.log('formData = ', data);
       dispatch({
-        type: 'modal-move',
+        type: 'modal-add',
         itemId,
+        item: {
+          label: data.label,
+          id: itemId,
+          children: [],
+        },
         targetId: data.parent === "NONE" ? "" : data.parent,
         /**
          * Subtract one to convert the position back to an index
          */
         index: Number(data.position) - 1,
       });
+      setOpen(false);
     },
     [dispatch, itemId],
   );
 
   useEffect(() => {
-    form.setValue('parent', parentId);
-    form.setValue('position', `${positionOptions[0].value}`);
-  }, []);
+    form.setValue('position', `${positionOptions[0]?.value || 1}`)
+  }, [positionOptions]);
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [open]);
 
   return (
-    <Dialog defaultOpen onOpenChange={(open) => !open && onClose()} aria-hidden="undefined">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Add New</Button>
+      </DialogTrigger>
       <DialogContent aria-describedby={undefined} className="bg-white">
         <DialogHeader>
-          <DialogTitle>Move</DialogTitle>
+          <DialogTitle>Add</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="label"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Label</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Node Name" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="parent"
@@ -108,22 +129,21 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
                 <FormItem>
                   <FormLabel>Parent</FormLabel>
                   <Select
-                    value={form.getValues().parent === "" ? "NONE" : form.getValues().parent}
                     onValueChange={(value) => {
                       invariant(value !== null);
                       setParentId(value === "NONE" ? "" : value);
                       field.onChange(value);
                     }}
-                    defaultValue={defaultParent.value}
+                    defaultValue={options[0].value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue/>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="bg-white">
                       {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value || "NONE"}>{option.label}</SelectItem>
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -144,7 +164,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Select a verified email to display" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -157,7 +177,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
                 </FormItem>
               )}
             />
-            <Button type="button" appearance="subtle" onClick={onClose}>
+            <Button type="button" appearance="subtle" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">Submit</Button>
@@ -168,4 +188,4 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
   );
 }
 
-export default ActionsDialog;
+export default AddNewDialog;

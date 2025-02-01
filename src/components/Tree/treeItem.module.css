@@ -6,7 +6,7 @@
     composes: root;
     composes: rounded-[3px] from global;
     composes: cursor-pointer from global;
-    composes: hover_bg-[#ecedef] from global;
+    @apply hover:bg-[#ecedef];
 }
 
 .preview {

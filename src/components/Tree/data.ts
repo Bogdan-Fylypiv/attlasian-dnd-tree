@@ -4,6 +4,7 @@ import type { Instruction } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-
 
 export type TreeItem = {
   id: string;
+  label: string;
   isDraft?: boolean;
   children: TreeItem[];
   isOpen?: boolean;
@@ -23,42 +24,54 @@ export function getInitialData(): TreeItem[] {
     {
       id: '1',
       isOpen: true,
+      label: 'Item 1',
 
       children: [
         {
           id: '1.3',
+          label: 'Item 1.3',
           isOpen: true,
 
           children: [
             {
               id: '1.3.1',
+              label: 'Item 1.3.1',
               children: [],
             },
             {
               id: '1.3.2',
+              label: 'Item 1.3.2',
               isDraft: true,
               children: [],
             },
           ],
         },
-        { id: '1.4', children: [] },
+        {
+          id: '1.4',
+          label: 'Item 1.4',
+          children: []
+        },
       ],
     },
     {
       id: '2',
+      label: 'Item 2',
       isOpen: true,
       children: [
         {
           id: '2.3',
+          label: 'Item 2.3',
           isOpen: true,
 
           children: [
             {
               id: '2.3.1',
+              label: 'Item 2.3.1',
               children: [],
             },
             {
               id: '2.3.2',
+              label: 'Item 2.3.2',
               children: [],
             },
           ],
@@ -74,6 +87,7 @@ export type TreeAction =
   instruction: Instruction;
   itemId: string;
   targetId: string;
+  item?: TreeItem;
 }
   | {
   type: 'toggle';
@@ -92,6 +106,13 @@ export type TreeAction =
   itemId: string;
   targetId: string;
   index: number
+}
+  | {
+  type: 'modal-add';
+  itemId: string;
+  item: TreeItem;
+  targetId: string;
+  index: number;
 };
 
 export const tree = {
@@ -212,7 +233,7 @@ export function treeStateReducer(state: TreeState, action: TreeAction): TreeStat
 const dataReducer = (data: TreeItem[], action: TreeAction) => {
   console.log('action', action);
 
-  const item = tree.find(data, action.itemId);
+  const item = "item" in action ? action.item : tree.find(data, action.itemId);
   if (!item) {
     return data;
   }
@@ -292,6 +313,43 @@ const dataReducer = (data: TreeItem[], action: TreeAction) => {
 
   if (action.type === 'modal-move') {
     let result = tree.remove(data, item.id);
+
+    const siblingItems = getChildItems(result, action.targetId);
+
+    if (siblingItems.length === 0) {
+      if (action.targetId === '') {
+        /**
+         * If the target is the root level, and there are no siblings, then
+         * the item is the only thing in the root level.
+         */
+        result = [item];
+      } else {
+        /**
+         * Otherwise for deeper levels that have no children, we need to
+         * use `insertChild` instead of inserting relative to a sibling.
+         */
+        result = tree.insertChild(result, action.targetId, item);
+      }
+    } else if (action.index === siblingItems.length) {
+      const relativeTo = siblingItems[siblingItems.length - 1];
+      /**
+       * If the position selected is the end, we insert after the last item.
+       */
+      result = tree.insertAfter(result, relativeTo.id, item);
+    } else {
+      const relativeTo = siblingItems[action.index];
+      /**
+       * Otherwise we insert before the existing item in the given position.
+       * This results in the new item being in that position.
+       */
+      result = tree.insertBefore(result, relativeTo.id, item);
+    }
+
+    return result;
+  }
+
+  if (action.type === 'modal-add') {
+    let result = data;
 
     const siblingItems = getChildItems(result, action.targetId);
 

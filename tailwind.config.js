@@ -11,7 +11,7 @@ export default {
     './src/**/*.module.css',
     './src/styles/*.css'
   ],
-  separator: '_',
+  // separator: '_',
   theme: {
     extend: {
       borderRadius: {
