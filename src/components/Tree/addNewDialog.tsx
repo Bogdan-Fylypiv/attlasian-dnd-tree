@@ -103,7 +103,7 @@ const AddNewDialog = () => {
       <DialogTrigger asChild>
         <Button>Add New</Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined} className="bg-white">
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Add</DialogTitle>
         </DialogHeader>
@@ -141,7 +141,7 @@ const AddNewDialog = () => {
                         <SelectValue/>
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-white">
+                    <SelectContent>
                       {options.map((option) => (
                         <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                       ))}

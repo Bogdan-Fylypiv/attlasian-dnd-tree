@@ -309,6 +309,12 @@ const TreeItem = memo(function TreeItem({
     setIsActionsDialogOpen(false);
   }, []);
 
+  const onNodeRemoving = useCallback(() => {
+    if (window.confirm(`Are you sure you want to remove "${item.label}"?`)) {
+      dispatch({ type: 'node-remove', itemId: item.id })
+    }
+  }, [item]);
+
   return (
     <Fragment>
       <div className={state === 'idle' ? classes.rootIdle : classes.root}>
@@ -391,12 +397,12 @@ const TreeItem = memo(function TreeItem({
               ⋮
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white">
+          <DropdownMenuContent>
             <DropdownMenuItem onSelect={openActionsDialog}>
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={openActionsDialog}>
-              Move
+            <DropdownMenuItem onSelect={onNodeRemoving}>
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

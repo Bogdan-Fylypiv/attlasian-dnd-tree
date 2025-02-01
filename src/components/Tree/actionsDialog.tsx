@@ -95,7 +95,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
 
   return (
     <Dialog defaultOpen onOpenChange={(open) => !open && onClose()} aria-hidden="undefined">
-      <DialogContent aria-describedby={undefined} className="bg-white">
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Move</DialogTitle>
         </DialogHeader>
@@ -121,7 +121,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-white">
+                    <SelectContent>
                       {options.map((option) => (
                         <SelectItem key={option.value} value={option.value || "NONE"}>{option.label}</SelectItem>
                       ))}

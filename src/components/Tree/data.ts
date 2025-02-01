@@ -113,6 +113,10 @@ export type TreeAction =
   item: TreeItem;
   targetId: string;
   index: number;
+}
+  | {
+  type: 'node-remove';
+  itemId: string;
 };
 
 export const tree = {
@@ -381,6 +385,12 @@ const dataReducer = (data: TreeItem[], action: TreeAction) => {
        */
       result = tree.insertBefore(result, relativeTo.id, item);
     }
+
+    return result;
+  }
+
+  if (action.type === 'node-remove') {
+    let result = tree.remove(data, item.id);
 
     return result;
   }
