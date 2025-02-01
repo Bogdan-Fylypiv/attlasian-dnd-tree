@@ -1,7 +1,10 @@
-import Tree from "./components/Tree";
+import Tree from "@/components/Tree";
 
 function App() {
-  return <Tree />;
+
+  return (
+    <Tree/>
+  )
 }
 
-export default App;
+export default App
