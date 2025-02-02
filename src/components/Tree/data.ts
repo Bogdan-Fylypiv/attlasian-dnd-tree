@@ -5,7 +5,7 @@ import type { Instruction } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-
 export type TreeItem = {
   id: string;
   label: string;
-  isDraft?: boolean;
+  color: string;
   children: TreeItem[];
   isOpen?: boolean;
 };
@@ -25,23 +25,26 @@ export function getInitialData(): TreeItem[] {
       id: '1',
       isOpen: true,
       label: 'Item 1',
+      color: 'green',
 
       children: [
         {
           id: '1.3',
           label: 'Item 1.3',
+          color: 'green',
           isOpen: true,
 
           children: [
             {
               id: '1.3.1',
               label: 'Item 1.3.1',
+              color: 'green',
               children: [],
             },
             {
               id: '1.3.2',
               label: 'Item 1.3.2',
-              isDraft: true,
+              color: 'green',
               children: [],
             },
           ],
@@ -49,6 +52,7 @@ export function getInitialData(): TreeItem[] {
         {
           id: '1.4',
           label: 'Item 1.4',
+          color: 'green',
           children: []
         },
       ],
@@ -56,22 +60,26 @@ export function getInitialData(): TreeItem[] {
     {
       id: '2',
       label: 'Item 2',
+      color: 'green',
       isOpen: true,
       children: [
         {
           id: '2.3',
           label: 'Item 2.3',
+          color: 'green',
           isOpen: true,
 
           children: [
             {
               id: '2.3.1',
               label: 'Item 2.3.1',
+              color: 'green',
               children: [],
             },
             {
               id: '2.3.2',
               label: 'Item 2.3.2',
+              color: 'green',
               children: [],
             },
           ],
@@ -117,6 +125,12 @@ export type TreeAction =
   | {
   type: 'node-remove';
   itemId: string;
+}
+  | {
+  type: 'modal-edit';
+  itemId: string;
+  item: TreeItem;
+  targetId: string;
 };
 
 export const tree = {
@@ -232,6 +246,18 @@ export function treeStateReducer(state: TreeState, action: TreeAction): TreeStat
     data: dataReducer(state.data, action),
     lastAction: action,
   };
+}
+
+function updateItem(items: TreeItem[], id: string, changes: Partial<TreeItem>): TreeItem[] {
+  return items.map(item => {
+    if (item.id === id) {
+      return { ...item, ...changes };
+    }
+    if (item.children.length > 0) {
+      return { ...item, children: updateItem(item.children, id, changes) };
+    }
+    return item;
+  });
 }
 
 const dataReducer = (data: TreeItem[], action: TreeAction) => {
@@ -389,10 +415,12 @@ const dataReducer = (data: TreeItem[], action: TreeAction) => {
     return result;
   }
 
-  if (action.type === 'node-remove') {
-    let result = tree.remove(data, item.id);
+  if (action.type === 'modal-edit') {
+    return updateItem(data, item.id, item);
+  }
 
-    return result;
+  if (action.type === 'node-remove') {
+    return tree.remove(data, item.id);
   }
 
   return data;

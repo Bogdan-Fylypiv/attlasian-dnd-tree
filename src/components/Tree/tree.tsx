@@ -129,13 +129,6 @@ const Tree = () => {
         continue;
       }
 
-      /**
-       * Draft items cannot have children.
-       */
-      if (node.isDraft) {
-        continue;
-      }
-
       targets.push(node);
 
       node.children.forEach((childNode) => searchStack.push(childNode));

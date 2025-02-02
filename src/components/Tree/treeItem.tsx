@@ -32,7 +32,9 @@ import {
   DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import ActionsDialog from "@/components/Tree/actionsDialog";
+import MoveDialog from "@/components/Tree/moveDialog";
+import EditDialog from "@/components/Tree/editDialog";
+import {cn} from "@/lib/utils.ts";
 
 const iconColor = token('color.icon', '#44546F');
 
@@ -215,7 +217,7 @@ const TreeItem = memo(function TreeItem({
             indentPerLevel,
             currentLevel: level,
             mode,
-            block: item.isDraft ? ['make-child'] : [],
+            block: [],
           });
         },
         canDrop: ({ source }) =>
@@ -301,12 +303,19 @@ const TreeItem = memo(function TreeItem({
     };
   })();
 
-  const [isActionsDialogOpen, setIsActionsDialogOpen] = useState(false);
-  const openActionsDialog = useCallback(() => {
-    setIsActionsDialogOpen(true);
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const openMoveDialog = useCallback(() => {
+    setIsMoveDialogOpen(true);
   }, []);
-  const closeActionsDialog = useCallback(() => {
-    setIsActionsDialogOpen(false);
+  const closeMoveDialog = useCallback(() => {
+    setIsMoveDialogOpen(false);
+  }, []);
+  const openEditDialog = useCallback(() => {
+    setIsEditDialogOpen(true);
+  }, []);
+  const closeEditDialog = useCallback(() => {
+    setIsEditDialogOpen(false);
   }, []);
 
   const onNodeRemoving = useCallback(() => {
@@ -373,7 +382,7 @@ const TreeItem = memo(function TreeItem({
                 margin: 0,
                 color: token('color.text.disabled', '#8993A5'),
               }}>
-								{item.isDraft ? <code>Draft</code> : null}
+								<span className={cn(classes.indicator, `bg-${item.color}-500`)}/>
                 <code style={{
                   position: 'absolute',
                   right: '8px',
@@ -398,8 +407,11 @@ const TreeItem = memo(function TreeItem({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={openActionsDialog}>
+            <DropdownMenuItem onSelect={openEditDialog}>
               Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={openMoveDialog}>
+              Move
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={onNodeRemoving}>
               Delete
@@ -433,7 +445,8 @@ const TreeItem = memo(function TreeItem({
           })}
         </div>
       ) : null}
-      {isActionsDialogOpen && <ActionsDialog onClose={closeActionsDialog} itemId={item.id} />}
+      {isMoveDialogOpen && <MoveDialog onClose={closeMoveDialog} itemId={item.id} />}
+      {isEditDialogOpen && <EditDialog onClose={closeEditDialog} item={item} />}
     </Fragment>
   );
 });

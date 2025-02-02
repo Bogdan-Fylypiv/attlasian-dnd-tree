@@ -15,3 +15,7 @@
     composes: rounded-[3px] from global;
 }
 
+.indicator {
+    composes: block w-[8px] h-[8px] rounded-full from global;
+}
+

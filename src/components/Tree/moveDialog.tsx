@@ -31,9 +31,10 @@ import {
 type FormValues = {
   parent: string;
   position: string;
+  label: string;
 };
 
-const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) => {
+const MoveDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) => {
   const {dispatch, getChildrenOfItem, getMoveTargets, getPathToItem} = useContext(TreeContext);
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
@@ -44,7 +45,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
     const targets = getMoveTargets({itemId});
 
     const targetOptions = targets.map((item) => {
-      return {label: `Item ${item.id}`, value: item.id};
+      return {label: item.label, value: item.id};
     });
 
     return [{label: 'No parent', value: 'NONE'}, ...targetOptions];
@@ -60,8 +61,6 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
 
   const [parentId, setParentId] = useState(defaultParent.value === "NONE" ? "" : defaultParent.value);
   const positionOptions = useMemo(() => {
-    console.log("positionOptions update");
-
     const targets = getChildrenOfItem(parentId).filter((item) => item.id !== itemId);
 
     return Array.from({length: targets.length + 1}, (_, index) => {
@@ -84,6 +83,7 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
          */
         index: Number(data.position) - 1,
       });
+      onClose();
     },
     [dispatch, itemId],
   );
@@ -168,4 +168,4 @@ const ActionsDialog = ({onClose, itemId}: { onClose: () => void; itemId: string 
   );
 }
 
-export default ActionsDialog;
+export default MoveDialog;

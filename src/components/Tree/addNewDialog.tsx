@@ -5,12 +5,6 @@ import invariant from 'tiny-invariant';
 import Button from '@atlaskit/button/new';
 
 import {TreeContext} from './context';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle, DialogTrigger
-} from "@/components/ui/dialog";
 import {useForm} from "react-hook-form";
 import {
   Form,
@@ -28,11 +22,24 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import {Input} from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet.tsx";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+import {colorClassMap} from "@/components/Tree/constants.ts";
+import { cn } from "@/lib/utils"
+import classes from "./form.module.css";
 
 type FormValues = {
   label: string;
   parent: string;
   position: string;
+  color: string;
 };
 
 const AddNewDialog = () => {
@@ -40,7 +47,7 @@ const AddNewDialog = () => {
   const {dispatch, getChildrenOfItem, getMoveTargets} = useContext(TreeContext);
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
-    defaultValues: { parent: "NONE", position: "1", label: "" },
+    defaultValues: {parent: "NONE", position: "1", label: "", color: Object.keys(colorClassMap)[0]},
   });
   const itemId = crypto.randomUUID();
 
@@ -48,7 +55,7 @@ const AddNewDialog = () => {
     const targets = getMoveTargets({itemId});
 
     const targetOptions = targets.map((item) => {
-      return {label: `Item ${item.id}`, value: item.id};
+      return {label: item.label, value: item.id};
     });
 
     return [{label: 'No parent', value: "NONE"}, ...targetOptions];
@@ -74,6 +81,7 @@ const AddNewDialog = () => {
         itemId,
         item: {
           label: data.label,
+          color: data.color,
           id: itemId,
           children: [],
         },
@@ -99,24 +107,52 @@ const AddNewDialog = () => {
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Add New</Button>
-      </DialogTrigger>
-      <DialogContent aria-describedby={undefined}>
-        <DialogHeader>
-          <DialogTitle>Add</DialogTitle>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button>Add New Node</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader className="mb-4">
+          <SheetTitle>Add New Button Action</SheetTitle>
+          <SheetDescription>
+            Create a new button action by filling out this form. Click add when you're done.
+          </SheetDescription>
+        </SheetHeader>
         <Form {...form}>
           <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="label"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Button Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Node Name" {...field} value={field.value || ''} />
+                    <Input required placeholder="Enter button name" {...field} value={field.value || ''}/>
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Select Button Color</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={Object.keys(colorClassMap)[0]}
+                      className="mt-2 grid grid-cols-4 gap-2"
+                    >
+                      {Object.keys(colorClassMap).map((color) => (
+                        <FormItem key={color}>
+                          <FormControl>
+                            <RadioGroupItem value={color} className={cn(classes.colorButton, `bg-${color}-500`)} />
+                          </FormControl>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,7 +183,7 @@ const AddNewDialog = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -164,7 +200,7 @@ const AddNewDialog = () => {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
+                        <SelectValue/>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -173,7 +209,7 @@ const AddNewDialog = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -183,8 +219,8 @@ const AddNewDialog = () => {
             <Button type="submit">Submit</Button>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

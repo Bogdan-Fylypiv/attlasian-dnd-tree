@@ -1,0 +1,12 @@
+.colorButton {
+    @apply p-2 w-full h-[34px] rounded text-white;
+    @apply hover:ring-2 hover:ring-offset-2;
+}
+
+.colorButton span {
+    display: none!important;
+}
+
+.colorButton[aria-checked='true'] {
+    @apply ring-2 ring-offset-2 ring-gray-800;
+}
