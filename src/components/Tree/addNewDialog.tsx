@@ -2,8 +2,6 @@ import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'rea
 
 import invariant from 'tiny-invariant';
 
-import Button from '@atlaskit/button/new';
-
 import {TreeContext} from './context';
 import {useForm} from "react-hook-form";
 import {
@@ -34,6 +32,7 @@ import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import {colorClassMap} from "@/components/Tree/constants.ts";
 import { cn } from "@/lib/utils"
 import classes from "./form.module.css";
+import {Button} from "@/components/ui/button.tsx";
 
 type FormValues = {
   label: string;
@@ -97,10 +96,6 @@ const AddNewDialog = () => {
   );
 
   useEffect(() => {
-    form.setValue('position', `${positionOptions[0]?.value || 1}`)
-  }, [positionOptions]);
-
-  useEffect(() => {
     if (!open) {
       form.reset();
     }
@@ -109,7 +104,7 @@ const AddNewDialog = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>Add New Node</Button>
+        <Button size="sm">Add New Node</Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader className="mb-4">
@@ -213,10 +208,12 @@ const AddNewDialog = () => {
                 </FormItem>
               )}
             />
-            <Button type="button" appearance="subtle" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Submit</Button>
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Submit</Button>
+            </div>
           </form>
         </Form>
       </SheetContent>

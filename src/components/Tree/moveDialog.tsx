@@ -2,8 +2,6 @@ import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'rea
 
 import invariant from 'tiny-invariant';
 
-import Button from '@atlaskit/button/new';
-
 import {TreeContext} from './context';
 import {
   Dialog,
@@ -27,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import {Button} from "@/components/ui/button.tsx";
 
 type FormValues = {
   parent: string;
@@ -118,7 +117,7 @@ const MoveDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) 
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue/>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -127,7 +126,7 @@ const MoveDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) 
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -144,7 +143,7 @@ const MoveDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) 
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue/>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -153,14 +152,16 @@ const MoveDialog = ({onClose, itemId}: { onClose: () => void; itemId: string }) 
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
-            <Button type="button" appearance="subtle" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Submit</Button>
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="secondary" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit">Submit</Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

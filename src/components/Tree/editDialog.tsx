@@ -1,7 +1,5 @@
 import {useCallback, useContext, useMemo, useRef} from 'react';
 
-import Button from '@atlaskit/button/new';
-
 import {TreeContext} from './context';
 import {
   Dialog,
@@ -25,6 +23,7 @@ import {colorClassMap} from "@/components/Tree/constants.ts";
 import {cn} from "@/lib/utils.ts";
 import classes from "@/components/Tree/form.module.css";
 import invariant from "tiny-invariant";
+import {Button} from "@/components/ui/button.tsx";
 
 type FormValues = {
   label: string;
@@ -100,7 +99,7 @@ const EditDialog = ({onClose, item}: { onClose: () => void; item: TreeItem }) =>
             <FormField
               control={form.control}
               name="color"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem className="space-y-3">
                   <FormLabel>Select Button Color</FormLabel>
                   <FormControl>
@@ -112,20 +111,22 @@ const EditDialog = ({onClose, item}: { onClose: () => void; item: TreeItem }) =>
                       {Object.keys(colorClassMap).map((color) => (
                         <FormItem key={color}>
                           <FormControl>
-                            <RadioGroupItem value={color} className={cn(classes.colorButton, `bg-${color}-500`)} />
+                            <RadioGroupItem value={color} className={cn(classes.colorButton, `bg-${color}-500`)}/>
                           </FormControl>
                         </FormItem>
                       ))}
                     </RadioGroup>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
-            <Button type="button" appearance="subtle" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Edit</Button>
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="secondary" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit">Edit</Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
