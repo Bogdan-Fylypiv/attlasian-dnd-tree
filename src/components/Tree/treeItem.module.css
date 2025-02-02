@@ -4,9 +4,14 @@
 
 .rootIdle {
     composes: root;
-    composes: rounded-[3px] from global;
     composes: cursor-pointer from global;
+}
+
+.button {
     @apply hover:bg-[#ecedef];
+    composes: bg-white from global;
+    composes: rounded-[3px] from global;
+    composes: shadow from global;
 }
 
 .preview {

@@ -38,14 +38,6 @@ import {cn} from "@/lib/utils.ts";
 
 const iconColor = token('color.icon', '#44546F');
 
-function ChildIcon() {
-  return (
-    <svg aria-hidden={true} width={24} height={24} viewBox="0 0 24 24">
-      <circle cx={12} cy={12} r={2} fill={iconColor} />
-    </svg>
-  );
-}
-
 function GroupIcon({ isOpen }: { isOpen: boolean }) {
   const Icon = isOpen ? ChevronDownIcon : ChevronRightIcon;
   return <Icon spacing="spacious" label="" color={iconColor} />;
@@ -53,7 +45,7 @@ function GroupIcon({ isOpen }: { isOpen: boolean }) {
 
 function Icon({ item }: { item: TreeItemType }) {
   if (!item.children.length) {
-    return <ChildIcon />;
+    return;
   }
   return <GroupIcon isOpen={item.isOpen ?? false} />;
 }
@@ -61,10 +53,6 @@ function Icon({ item }: { item: TreeItemType }) {
 function Preview({ item }: { item: TreeItemType }) {
   return <div className={classes.preview}>{item.label}</div>;
 }
-
-// const parentOfInstructionStyles = css({
-//   background: token('color.background.selected.hovered', 'transparent'),
-// });
 
 function getParentLevelOfInstruction(instruction: Instruction): number {
   if (instruction.type === 'instruction-blocked') {
@@ -352,25 +340,28 @@ const TreeItem = memo(function TreeItem({
             data-testid={`tree-item-${item.id}`}
           >
 						<span
+              className={classes.button}
               style={{
                 ...{
-                  padding: '8px',
+                  padding: '16px',
                   paddingRight: 40,
                   alignItems: 'center',
                   display: 'flex',
+                  gap: 8,
                   flexDirection: 'row',
 
-                  background: token('color.background.neutral.subtle', 'transparent'),
+                  // background: token('color.background.neutral.subtle', 'transparent'),
                   borderRadius: 3,
                 },
                 ...(state === 'dragging'
-                  ? { opacity: 0.4 }
+                  ? {opacity: 0.4}
                   : state === 'parent-of-instruction'
-                    ? { background: token('color.background.selected.hovered', 'transparent') }
+                    ? {background: token('color.background.selected.hovered', 'transparent')}
                     : {}),
               }}
             >
-							<Icon item={item} />
+							<Icon item={item}/>
+              <span className={cn(classes.indicator, `bg-${item.color}-500`)}/>
 							<span style={{
                 flexGrow: 1,
                 overflow: 'hidden',
@@ -378,18 +369,6 @@ const TreeItem = memo(function TreeItem({
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}>{item.label}</span>
-							<small style={{
-                margin: 0,
-                color: token('color.text.disabled', '#8993A5'),
-              }}>
-								<span className={cn(classes.indicator, `bg-${item.color}-500`)}/>
-                <code style={{
-                  position: 'absolute',
-                  right: '8px',
-                  bottom: 0,
-                  fontSize: '6px',
-                }}>({mode})</code>
-							</small>
 						</span>
             {instruction ? <DropIndicator instruction={instruction} /> : null}
           </button>
@@ -401,7 +380,7 @@ const TreeItem = memo(function TreeItem({
               ref={actionMenuTriggerRef}
               variant="outline"
               size="icon"
-              style={{ position: 'absolute', top: 8, right: 8 }}
+              style={{ position: 'absolute', top: "50%", right: 8, transform: "translateY(-50%)" }}
             >
               ⋮
             </Button>
@@ -420,7 +399,7 @@ const TreeItem = memo(function TreeItem({
         </DropdownMenu>
       </div>
       {item.children.length && item.isOpen ? (
-        <div id={aria?.['aria-controls']}>
+        <div id={aria?.['aria-controls']} className="flex flex-col gap-[8px]">
           {item.children.map((child, index, array) => {
             const childType: ItemMode = (() => {
               if (child.children.length && child.isOpen) {
