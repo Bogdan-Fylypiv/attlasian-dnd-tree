@@ -1,16 +1,24 @@
-import {useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 
-import {triggerPostMoveFlash} from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
+import { triggerPostMoveFlash } from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
 import {
   type Instruction,
   type ItemMode,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import * as liveRegion from '@atlaskit/pragmatic-drag-and-drop-live-region';
-import {combine} from '@atlaskit/pragmatic-drag-and-drop/combine';
-import {monitorForElements} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import classes from './tree.module.css';
 
 import {
@@ -19,41 +27,54 @@ import {
   type TreeItem as TreeItemType,
   treeStateReducer,
 } from './data';
-import {DependencyContext, TreeContext, type TreeContextValue} from './context';
+import {
+  DependencyContext,
+  TreeContext,
+  type TreeContextValue,
+} from './context';
 import TreeItem from './treeItem';
-import AddNewDialog from "@/components/Tree/addNewDialog";
+import AddNewDialog from '@/components/Tree/addNewDialog';
+import Messages from '../Messages';
 
 type CleanupFn = () => void;
 
 function createTreeItemRegistry() {
-  const registry = new Map<string, { element: HTMLElement; actionMenuTrigger: HTMLElement }>();
+  const registry = new Map<
+    string,
+    { element: HTMLElement; actionMenuTrigger: HTMLElement }
+  >();
 
   const registerTreeItem = ({
-                              itemId,
-                              element,
-                              actionMenuTrigger,
-                            }: {
+    itemId,
+    element,
+    actionMenuTrigger,
+  }: {
     itemId: string;
     element: HTMLElement;
     actionMenuTrigger: HTMLElement;
   }): CleanupFn => {
-    registry.set(itemId, {element, actionMenuTrigger});
+    registry.set(itemId, { element, actionMenuTrigger });
     return () => {
       registry.delete(itemId);
     };
   };
 
-  return {registry, registerTreeItem};
+  return { registry, registerTreeItem };
 }
 
 const Tree = () => {
-  const [state, updateState] = useReducer(treeStateReducer, null, getInitialTreeState);
+  const [state, updateState] = useReducer(
+    treeStateReducer,
+    null,
+    getInitialTreeState,
+  );
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const {extractInstruction} = useContext(DependencyContext);
+  const { extractInstruction } = useContext(DependencyContext);
 
-  const [{registry, registerTreeItem}] = useState(createTreeItemRegistry);
+  const [{ registry, registerTreeItem }] = useState(createTreeItemRegistry);
 
-  const {data, lastAction} = state;
+  const { data, lastAction } = state;
   const lastStateRef = useRef<TreeItemType[]>(data);
   useEffect(() => {
     lastStateRef.current = data;
@@ -65,7 +86,8 @@ const Tree = () => {
     }
 
     if (lastAction.type === 'modal-move') {
-      const parentName = lastAction.targetId === '' ? 'the root' : `Item ${lastAction.targetId}`;
+      const parentName =
+        lastAction.targetId === '' ? 'the root' : `Item ${lastAction.targetId}`;
 
       liveRegion.announce(
         `You've moved Item ${lastAction.itemId} to position ${
@@ -73,7 +95,8 @@ const Tree = () => {
         } in ${parentName}.`,
       );
 
-      const {element, actionMenuTrigger} = registry.get(lastAction.itemId) ?? {};
+      const { element, actionMenuTrigger } =
+        registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
       }
@@ -88,7 +111,7 @@ const Tree = () => {
     }
 
     if (lastAction.type === 'instruction') {
-      const {element} = registry.get(lastAction.itemId) ?? {};
+      const { element } = registry.get(lastAction.itemId) ?? {};
       if (element) {
         triggerPostMoveFlash(element);
       }
@@ -108,7 +131,7 @@ const Tree = () => {
    *
    * Uses a depth-first search (DFS) to compile a list of possible targets.
    */
-  const getMoveTargets = useCallback(({itemId}: { itemId: string }) => {
+  const getMoveTargets = useCallback(({ itemId }: { itemId: string }) => {
     const data = lastStateRef.current;
 
     const targets = [];
@@ -152,6 +175,14 @@ const Tree = () => {
     return item.children;
   }, []);
 
+  const handleOpenMessages = (item: TreeItemType) => {
+    if (item.children.length === 0) {
+      setIsMessagesOpen(true);
+      return;
+    }
+    setIsMessagesOpen(false);
+  };
+
   const context = useMemo<TreeContextValue>(
     () => ({
       dispatch: updateState,
@@ -160,7 +191,8 @@ const Tree = () => {
       // An ideal refactor would be to update our data shape
       // to allow quick lookups of parents
       getPathToItem: memoizeOne(
-        (targetId: string) => tree.getPathToItem({current: lastStateRef.current, targetId}) ?? [],
+        (targetId: string) =>
+          tree.getPathToItem({ current: lastStateRef.current, targetId }) ?? [],
       ),
       getMoveTargets,
       getChildrenOfItem,
@@ -173,9 +205,10 @@ const Tree = () => {
     invariant(ref.current);
     return combine(
       monitorForElements({
-        canMonitor: ({source}) => source.data.uniqueContextId === context.uniqueContextId,
+        canMonitor: ({ source }) =>
+          source.data.uniqueContextId === context.uniqueContextId,
         onDrop(args) {
-          const {location, source} = args;
+          const { location, source } = args;
           // didn't drop on anything
           if (!location.current.dropTargets.length) {
             return;
@@ -187,7 +220,9 @@ const Tree = () => {
             const target = location.current.dropTargets[0];
             const targetId = target.data.id as string;
 
-            const instruction: Instruction | null = extractInstruction(target.data);
+            const instruction: Instruction | null = extractInstruction(
+              target.data,
+            );
 
             if (instruction !== null) {
               updateState({
@@ -206,9 +241,7 @@ const Tree = () => {
   return (
     <TreeContext.Provider value={context}>
       <div className={classes.root}>
-        <div
-          className={classes.container}
-          id="tree" ref={ref}>
+        <div className={classes.container} id='tree' ref={ref}>
           {data.map((item, index, array) => {
             const type: ItemMode = (() => {
               if (item.children.length && item.isOpen) {
@@ -222,13 +255,23 @@ const Tree = () => {
               return 'standard';
             })();
 
-            return <TreeItem item={item} level={0} key={item.id} mode={type} index={index}/>;
+            return (
+              <TreeItem
+                item={item}
+                level={0}
+                key={item.id}
+                mode={type}
+                index={index}
+                handleOpenMessages={handleOpenMessages}
+              />
+            );
           })}
+          <AddNewDialog />
         </div>
-        <AddNewDialog />
+        {isMessagesOpen && <Messages />}
       </div>
     </TreeContext.Provider>
   );
-}
+};
 
 export default Tree;

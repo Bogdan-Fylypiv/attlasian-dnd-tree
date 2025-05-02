@@ -1,0 +1,32 @@
+.messages {
+  @apply bg-[#808080];
+  @apply p-[8px];
+  @apply flex-grow;
+}
+
+.message {
+  @apply bg-[#36454F];
+  @apply w-[75%];
+  @apply mb-1;
+  composes: rounded-[3px] from global;
+}
+
+.messageHeader {
+  @apply flex gap-2 items-center;
+  @apply p-[8px];
+  @apply text-[#D3D3D3];
+}
+
+.messageDate {
+  @apply text-white text-xs;
+}
+
+.messageContent {
+  @apply text-[#D3D3D3] text-sm;
+  @apply p-[8px];
+}
+
+.avatar {
+  composes: block w-[24px] h-[24px] rounded-full bg-cover bg-center from global;
+  background-image: url('/public/assets/avatar.png');
+}

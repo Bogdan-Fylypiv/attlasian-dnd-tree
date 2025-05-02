@@ -5,7 +5,7 @@ import type { Instruction } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-
 export type TreeItem = {
   id: string;
   label: string;
-  color: string;
+  color?: string;
   children: TreeItem[];
   isOpen?: boolean;
 };
@@ -24,62 +24,56 @@ export function getInitialData(): TreeItem[] {
     {
       id: '1',
       isOpen: true,
-      label: 'Item 1',
+      label: 'Group 1',
       color: 'green',
-
       children: [
         {
           id: '1.3',
-          label: 'Item 1.3',
+          label: 'Sub-group 1.1',
           color: 'green',
           isOpen: true,
 
           children: [
             {
               id: '1.3.1',
-              label: 'Item 1.3.1',
-              color: 'green',
+              label: 'Mark',
               children: [],
             },
             {
               id: '1.3.2',
-              label: 'Item 1.3.2',
-              color: 'green',
+              label: 'David',
               children: [],
             },
           ],
         },
         {
           id: '1.4',
-          label: 'Item 1.4',
-          color: 'green',
-          children: []
+          label: 'Joseph',
+          children: [],
         },
       ],
     },
     {
       id: '2',
-      label: 'Item 2',
+      label: 'Group 2',
       color: 'green',
       isOpen: true,
       children: [
         {
           id: '2.3',
-          label: 'Item 2.3',
+          label: 'Sub-group 2.1',
           color: 'green',
           isOpen: true,
 
           children: [
             {
               id: '2.3.1',
-              label: 'Item 2.3.1',
-              color: 'green',
+              label: 'Emanuel',
               children: [],
             },
             {
               id: '2.3.2',
-              label: 'Item 2.3.2',
-              color: 'green',
+              label: 'Linda',
               children: [],
             },
           ],
@@ -91,47 +85,47 @@ export function getInitialData(): TreeItem[] {
 
 export type TreeAction =
   | {
-  type: 'instruction';
-  instruction: Instruction;
-  itemId: string;
-  targetId: string;
-  item?: TreeItem;
-}
+      type: 'instruction';
+      instruction: Instruction;
+      itemId: string;
+      targetId: string;
+      item?: TreeItem;
+    }
   | {
-  type: 'toggle';
-  itemId: string;
-}
+      type: 'toggle';
+      itemId: string;
+    }
   | {
-  type: 'expand';
-  itemId: string;
-}
+      type: 'expand';
+      itemId: string;
+    }
   | {
-  type: 'collapse';
-  itemId: string;
-}
+      type: 'collapse';
+      itemId: string;
+    }
   | {
-  type: 'modal-move';
-  itemId: string;
-  targetId: string;
-  index: number
-}
+      type: 'modal-move';
+      itemId: string;
+      targetId: string;
+      index: number;
+    }
   | {
-  type: 'modal-add';
-  itemId: string;
-  item: TreeItem;
-  targetId: string;
-  index: number;
-}
+      type: 'modal-add';
+      itemId: string;
+      item: TreeItem;
+      targetId: string;
+      index: number;
+    }
   | {
-  type: 'node-remove';
-  itemId: string;
-}
+      type: 'node-remove';
+      itemId: string;
+    }
   | {
-  type: 'modal-edit';
-  itemId: string;
-  item: TreeItem;
-  targetId: string;
-};
+      type: 'modal-edit';
+      itemId: string;
+      item: TreeItem;
+      targetId: string;
+    };
 
 export const tree = {
   remove(data: TreeItem[], id: string): TreeItem[] {
@@ -147,7 +141,11 @@ export const tree = {
         return item;
       });
   },
-  insertBefore(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
+  insertBefore(
+    data: TreeItem[],
+    targetId: string,
+    newItem: TreeItem,
+  ): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         return [newItem, item];
@@ -161,7 +159,11 @@ export const tree = {
       return item;
     });
   },
-  insertAfter(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
+  insertAfter(
+    data: TreeItem[],
+    targetId: string,
+    newItem: TreeItem,
+  ): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         return [item, newItem];
@@ -177,7 +179,11 @@ export const tree = {
       return item;
     });
   },
-  insertChild(data: TreeItem[], targetId: string, newItem: TreeItem): TreeItem[] {
+  insertChild(
+    data: TreeItem[],
+    targetId: string,
+    newItem: TreeItem,
+  ): TreeItem[] {
     return data.flatMap((item) => {
       if (item.id === targetId) {
         // already a parent: add as first child
@@ -214,10 +220,10 @@ export const tree = {
     }
   },
   getPathToItem({
-                  current,
-                  targetId,
-                  parentIds = [],
-                }: {
+    current,
+    targetId,
+    parentIds = [],
+  }: {
     current: TreeItem[];
     targetId: string;
     parentIds?: string[];
@@ -241,15 +247,22 @@ export const tree = {
   },
 };
 
-export function treeStateReducer(state: TreeState, action: TreeAction): TreeState {
+export function treeStateReducer(
+  state: TreeState,
+  action: TreeAction,
+): TreeState {
   return {
     data: dataReducer(state.data, action),
     lastAction: action,
   };
 }
 
-function updateItem(items: TreeItem[], id: string, changes: Partial<TreeItem>): TreeItem[] {
-  return items.map(item => {
+function updateItem(
+  items: TreeItem[],
+  id: string,
+  changes: Partial<TreeItem>,
+): TreeItem[] {
+  return items.map((item) => {
     if (item.id === id) {
       return { ...item, ...changes };
     }
@@ -263,7 +276,7 @@ function updateItem(items: TreeItem[], id: string, changes: Partial<TreeItem>): 
 const dataReducer = (data: TreeItem[], action: TreeAction) => {
   console.log('action', action);
 
-  const item = "item" in action ? action.item : tree.find(data, action.itemId);
+  const item = 'item' in action ? action.item : tree.find(data, action.itemId);
   if (!item) {
     return data;
   }

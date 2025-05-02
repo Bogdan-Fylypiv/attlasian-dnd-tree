@@ -1,9 +1,17 @@
-import { Fragment, memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { createRoot } from 'react-dom/client';
 import invariant from 'tiny-invariant';
 
-import {Button} from "../ui/button";
+import { Button } from '../ui/button';
 import FocusRing from '@atlaskit/focus-ring';
 import ChevronDownIcon from '@atlaskit/icon/utility/migration/chevron-down';
 import ChevronRightIcon from '@atlaskit/icon/utility/migration/chevron-right';
@@ -20,7 +28,7 @@ import {
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import type { DragLocationHistory } from '@atlaskit/pragmatic-drag-and-drop/types';
-import classes from "./treeItem.module.css"
+import classes from './treeItem.module.css';
 import { token } from '@atlaskit/tokens';
 
 import { type TreeItem as TreeItemType } from './data';
@@ -29,18 +37,19 @@ import { indentPerLevel } from './constants';
 import { DependencyContext, TreeContext } from './context';
 import {
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import MoveDialog from "@/components/Tree/moveDialog";
-import EditDialog from "@/components/Tree/editDialog";
-import {cn} from "@/lib/utils.ts";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import MoveDialog from '@/components/Tree/moveDialog';
+import EditDialog from '@/components/Tree/editDialog';
+import { cn } from '@/lib/utils.ts';
 
-const iconColor = token('color.icon', '#44546F');
+const iconColor = token('color.icon', '#D3D3D3');
 
 function GroupIcon({ isOpen }: { isOpen: boolean }) {
   const Icon = isOpen ? ChevronDownIcon : ChevronRightIcon;
-  return <Icon spacing="spacious" label="" color={iconColor} />;
+  return <Icon spacing='spacious' label='' color={iconColor} />;
 }
 
 function Icon({ item }: { item: TreeItemType }) {
@@ -64,7 +73,13 @@ function getParentLevelOfInstruction(instruction: Instruction): number {
   return instruction.currentLevel - 1;
 }
 
-function delay({ waitMs: timeMs, fn }: { waitMs: number; fn: () => void }): () => void {
+function delay({
+  waitMs: timeMs,
+  fn,
+}: {
+  waitMs: number;
+  fn: () => void;
+}): () => void {
   let timeoutId: number | null = window.setTimeout(() => {
     timeoutId = null;
     fn();
@@ -78,28 +93,33 @@ function delay({ waitMs: timeMs, fn }: { waitMs: number; fn: () => void }): () =
 }
 
 const TreeItem = memo(function TreeItem({
-                                          item,
-                                          mode,
-                                          level,
-                                          index,
-                                        }: {
+  item,
+  mode,
+  level,
+  index,
+  handleOpenMessages,
+}: {
   item: TreeItemType;
   mode: ItemMode;
   level: number;
   index: number;
+  handleOpenMessages: (item: TreeItemType) => void;
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const [state, setState] = useState<'idle' | 'dragging' | 'preview' | 'parent-of-instruction'>(
-    'idle',
-  );
+  const [state, setState] = useState<
+    'idle' | 'dragging' | 'preview' | 'parent-of-instruction'
+  >('idle');
   const [instruction, setInstruction] = useState<Instruction | null>(null);
   const cancelExpandRef = useRef<(() => void) | null>(null);
 
-  const { dispatch, uniqueContextId, getPathToItem, registerTreeItem } = useContext(TreeContext);
-  const { DropIndicator, attachInstruction, extractInstruction } = useContext(DependencyContext);
+  const { dispatch, uniqueContextId, getPathToItem, registerTreeItem } =
+    useContext(TreeContext);
+  const { DropIndicator, attachInstruction, extractInstruction } =
+    useContext(DependencyContext);
   const toggleOpen = useCallback(() => {
     dispatch({ type: 'toggle', itemId: item.id });
+    handleOpenMessages(item);
   }, [dispatch, item]);
 
   const actionMenuTriggerRef = useRef<HTMLButtonElement>(null);
@@ -119,7 +139,9 @@ const TreeItem = memo(function TreeItem({
   }, []);
 
   const clearParentOfInstructionState = useCallback(() => {
-    setState((current) => (current === 'parent-of-instruction' ? 'idle' : current));
+    setState((current) =>
+      current === 'parent-of-instruction' ? 'idle' : current,
+    );
   }, []);
 
   // When an item has an instruction applied
@@ -152,7 +174,11 @@ const TreeItem = memo(function TreeItem({
   useEffect(() => {
     invariant(buttonRef.current);
 
-    function updateIsParentOfInstruction({ location }: { location: DragLocationHistory }) {
+    function updateIsParentOfInstruction({
+      location,
+    }: {
+      location: DragLocationHistory;
+    }) {
       if (shouldHighlightParent(location)) {
         setState('parent-of-instruction');
         return;
@@ -209,7 +235,8 @@ const TreeItem = memo(function TreeItem({
           });
         },
         canDrop: ({ source }) =>
-          source.data.type === 'tree-item' && source.data.uniqueContextId === uniqueContextId,
+          source.data.type === 'tree-item' &&
+          source.data.uniqueContextId === uniqueContextId,
         getIsSticky: () => true,
         onDrag: ({ self, source }) => {
           const instruction = extractInstruction(self.data);
@@ -250,7 +277,8 @@ const TreeItem = memo(function TreeItem({
         },
       }),
       monitorForElements({
-        canMonitor: ({ source }) => source.data.uniqueContextId === uniqueContextId,
+        canMonitor: ({ source }) =>
+          source.data.uniqueContextId === uniqueContextId,
         onDragStart: updateIsParentOfInstruction,
         onDrag: updateIsParentOfInstruction,
         onDrop() {
@@ -308,7 +336,7 @@ const TreeItem = memo(function TreeItem({
 
   const onNodeRemoving = useCallback(() => {
     if (window.confirm(`Are you sure you want to remove "${item.label}"?`)) {
-      dispatch({ type: 'node-remove', itemId: item.id })
+      dispatch({ type: 'node-remove', itemId: item.id });
     }
   }, [item]);
 
@@ -329,17 +357,17 @@ const TreeItem = memo(function TreeItem({
               padding: 0,
               borderRadius: 3,
               cursor: 'pointer',
-              paddingLeft: level * indentPerLevel
+              paddingLeft: level * indentPerLevel,
             }}
             id={`tree-item-${item.id}`}
             onClick={toggleOpen}
             ref={buttonRef}
-            type="button"
+            type='button'
             data-index={index}
             data-level={level}
             data-testid={`tree-item-${item.id}`}
           >
-						<span
+            <span
               className={classes.button}
               style={{
                 ...{
@@ -354,44 +382,63 @@ const TreeItem = memo(function TreeItem({
                   borderRadius: 3,
                 },
                 ...(state === 'dragging'
-                  ? {opacity: 0.4}
+                  ? { opacity: 0.4 }
                   : state === 'parent-of-instruction'
-                    ? {background: token('color.background.selected.hovered', 'transparent')}
-                    : {}),
+                  ? {
+                      background: token(
+                        'color.background.selected.hovered',
+                        'transparent',
+                      ),
+                    }
+                  : {}),
               }}
             >
-							<Icon item={item}/>
-              <span className={cn(classes.indicator, `bg-${item.color}-500`)}/>
-							<span style={{
-                flexGrow: 1,
-                overflow: 'hidden',
-                textAlign: 'left',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>{item.label}</span>
-						</span>
+              <Icon item={item} />
+              {item.color ? (
+                <span
+                  className={cn(classes.indicator, `bg-${item.color}-500`)}
+                />
+              ) : (
+                <span className={classes.avatar} />
+              )}
+
+              <span
+                style={{
+                  flexGrow: 1,
+                  overflow: 'hidden',
+                  textAlign: 'left',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  color: '#D3D3D3',
+                }}
+              >
+                {item.label}
+              </span>
+            </span>
             {instruction ? <DropIndicator instruction={instruction} /> : null}
           </button>
         </FocusRing>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
-              className="w-5 h-5"
+              className='w-5 h-5'
               ref={actionMenuTriggerRef}
-              variant="outline"
-              size="icon"
-              style={{ position: 'absolute', top: "50%", right: 8, transform: "translateY(-50%)" }}
+              variant='outline'
+              size='icon'
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: 8,
+                transform: 'translateY(-50%)',
+                backgroundColor: '#D3D3D3',
+              }}
             >
               ⋮
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={openEditDialog}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={openMoveDialog}>
-              Move
-            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={openEditDialog}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onSelect={openMoveDialog}>Move</DropdownMenuItem>
             <DropdownMenuItem onSelect={onNodeRemoving}>
               Delete
             </DropdownMenuItem>
@@ -399,7 +446,7 @@ const TreeItem = memo(function TreeItem({
         </DropdownMenu>
       </div>
       {item.children.length && item.isOpen ? (
-        <div id={aria?.['aria-controls']} className="flex flex-col gap-[8px]">
+        <div id={aria?.['aria-controls']} className='flex flex-col gap-[8px]'>
           {item.children.map((child, index, array) => {
             const childType: ItemMode = (() => {
               if (child.children.length && child.isOpen) {
@@ -419,12 +466,15 @@ const TreeItem = memo(function TreeItem({
                 level={level + 1}
                 mode={childType}
                 index={index}
+                handleOpenMessages={handleOpenMessages}
               />
             );
           })}
         </div>
       ) : null}
-      {isMoveDialogOpen && <MoveDialog onClose={closeMoveDialog} itemId={item.id} />}
+      {isMoveDialogOpen && (
+        <MoveDialog onClose={closeMoveDialog} itemId={item.id} />
+      )}
       {isEditDialogOpen && <EditDialog onClose={closeEditDialog} item={item} />}
     </Fragment>
   );

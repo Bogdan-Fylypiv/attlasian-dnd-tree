@@ -1,26 +1,31 @@
 .root {
-    composes: relative from global;
+  composes: relative from global;
 }
 
 .rootIdle {
-    composes: root;
-    composes: cursor-pointer from global;
+  composes: root;
+  composes: cursor-pointer from global;
 }
 
 .button {
-    @apply hover:bg-[#ecedef];
-    composes: bg-white from global;
-    composes: rounded-[3px] from global;
-    composes: shadow from global;
+  @apply bg-[#36454F];
+  @apply hover:bg-[#818589];
+  composes: bg-white from global;
+  composes: rounded-[3px] from global;
+  composes: shadow from global;
 }
 
 .preview {
-    composes: bg-white from global;
-    composes: p-[8px] from global;
-    composes: rounded-[3px] from global;
+  composes: bg-white from global;
+  composes: p-[8px] from global;
+  composes: rounded-[3px] from global;
 }
 
 .indicator {
-    composes: block w-[8px] h-[8px] rounded-full from global;
+  composes: block w-[8px] h-[8px] rounded-full from global;
 }
 
+.avatar {
+  composes: block w-[24px] h-[24px] rounded-full bg-cover bg-center from global;
+  background-image: url('/public/assets/avatar.png');
+}
