@@ -348,7 +348,6 @@ const TreeItem = memo(function TreeItem({
             {...aria}
             style={{
               color: token('color.text', 'currentColor'),
-
               border: 0,
               width: '100%',
               position: 'relative',
@@ -377,9 +376,8 @@ const TreeItem = memo(function TreeItem({
                   display: 'flex',
                   gap: 8,
                   flexDirection: 'row',
-
-                  // background: token('color.background.neutral.subtle', 'transparent'),
                   borderRadius: 3,
+                  flexWrap: 'wrap',
                 },
                 ...(state === 'dragging'
                   ? { opacity: 0.4 }
@@ -414,7 +412,23 @@ const TreeItem = memo(function TreeItem({
               >
                 {item.label}
               </span>
+              {item.children.length === 0 && (
+                <span
+                  style={{
+                    fontSize: '12px',
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                    textAlign: 'left',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    color: '#D3D3D3',
+                  }}
+                >
+                  Mark: This is the content of the ...
+                </span>
+              )}
             </span>
+
             {instruction ? <DropIndicator instruction={instruction} /> : null}
           </button>
         </FocusRing>
@@ -430,7 +444,9 @@ const TreeItem = memo(function TreeItem({
                 top: '50%',
                 right: 8,
                 transform: 'translateY(-50%)',
-                backgroundColor: '#D3D3D3',
+                backgroundColor: '#808080',
+                color: '#D3D3D3',
+                border: 'none',
               }}
             >
               ⋮

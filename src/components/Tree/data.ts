@@ -8,6 +8,7 @@ export type TreeItem = {
   color?: string;
   children: TreeItem[];
   isOpen?: boolean;
+  messagesAmount: number;
 };
 
 export type TreeState = {
@@ -26,23 +27,26 @@ export function getInitialData(): TreeItem[] {
       isOpen: true,
       label: 'Group 1',
       color: 'green',
+      messagesAmount: 0,
       children: [
         {
           id: '1.3',
           label: 'Sub-group 1.1',
           color: 'green',
           isOpen: true,
-
+          messagesAmount: 0,
           children: [
             {
               id: '1.3.1',
               label: 'Mark',
               children: [],
+              messagesAmount: 1,
             },
             {
               id: '1.3.2',
               label: 'David',
               children: [],
+              messagesAmount: 2,
             },
           ],
         },
@@ -50,6 +54,7 @@ export function getInitialData(): TreeItem[] {
           id: '1.4',
           label: 'Joseph',
           children: [],
+          messagesAmount: 3,
         },
       ],
     },
@@ -58,23 +63,26 @@ export function getInitialData(): TreeItem[] {
       label: 'Group 2',
       color: 'green',
       isOpen: true,
+      messagesAmount: 0,
       children: [
         {
           id: '2.3',
           label: 'Sub-group 2.1',
           color: 'green',
           isOpen: true,
-
+          messagesAmount: 0,
           children: [
             {
               id: '2.3.1',
               label: 'Emanuel',
               children: [],
+              messagesAmount: 4,
             },
             {
               id: '2.3.2',
               label: 'Linda',
               children: [],
+              messagesAmount: 3,
             },
           ],
         },

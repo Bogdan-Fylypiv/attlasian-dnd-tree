@@ -69,6 +69,7 @@ const Tree = () => {
     getInitialTreeState,
   );
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [messagesAmount, setMessagesAmount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const { extractInstruction } = useContext(DependencyContext);
 
@@ -178,6 +179,7 @@ const Tree = () => {
   const handleOpenMessages = (item: TreeItemType) => {
     if (item.children.length === 0) {
       setIsMessagesOpen(true);
+      setMessagesAmount(item.messagesAmount);
       return;
     }
     setIsMessagesOpen(false);
@@ -268,7 +270,7 @@ const Tree = () => {
           })}
           <AddNewDialog />
         </div>
-        {isMessagesOpen && <Messages />}
+        {isMessagesOpen && <Messages messagesAmount={messagesAmount} />}
       </div>
     </TreeContext.Provider>
   );

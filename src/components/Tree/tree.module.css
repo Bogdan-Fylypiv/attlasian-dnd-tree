@@ -5,6 +5,7 @@
 
 .container {
   @apply flex flex-col gap-[8px];
+  @apply min-w-[280px];
   @apply w-[280px];
   @apply p-[8px];
   @apply bg-[#808080];
